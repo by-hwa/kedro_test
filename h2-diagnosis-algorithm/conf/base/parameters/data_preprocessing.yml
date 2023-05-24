@@ -1,0 +1,17 @@
+preprocessing_option:
+  cluster_training: False
+  training: False
+  split-time:
+    - 2022-12-31
+    - 2023-02-28
+    - 2023-03-01
+    - 2023-04-24
+  asset-type:
+    - "MP"
+    - "HP"
+  exclude-part:
+    - "valve"
+    - "solenoid"
+    - "actuator"
+    - "lube"
+  file-path: "./data/01_raw/"
