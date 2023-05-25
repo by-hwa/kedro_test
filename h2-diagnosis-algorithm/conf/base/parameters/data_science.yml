@@ -1,0 +1,20 @@
+data_science_option:
+  cluster-training: False
+  training: True
+  split-time:
+    - 2022-12-31
+    - 2023-02-28
+    - 2023-03-01
+    - 2023-04-24
+  model-name: "RegressionCnn"
+  divide-len:
+    HP: 110
+    MP: 220
+  asset-type:
+    - "MP"
+    - "HP"
+  exclude-part:
+    - "valve"
+    - "solenoid"
+    - "actuator"
+    - "lube"
