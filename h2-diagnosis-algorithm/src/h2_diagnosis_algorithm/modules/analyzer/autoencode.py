@@ -170,9 +170,10 @@ class DivideEncoder:
             data_loader = convert_loader(train_input, batch)
             trainer = Trainer(input_dim, input_len)
             trainer.fit(data_loader, (epochs*len(train_input_dict))//(len(train_input_dict)-divide_id))
-            torch.save(trainer.model, f"{self.save_dir}_divide{divide_id}")
+            # torch.save(trainer.model, f"{self.save_dir}_divide{divide_id}")
+            return trainer.model
 
-    def encode_dataset(self, encode_input_dict: dict):
+    def encode_dataset(self, encode_input_dict: dict, model):
         """
         Encode data for each division. Load the trained model.
 
@@ -180,7 +181,7 @@ class DivideEncoder:
         """
         all_encodes = OrderedDict()
         for divide_id in range(self.divide_num):
-            model = torch.load(f"{self.save_dir}_divide{divide_id}")
+            # model = torch.load(f"{self.save_dir}_divide{divide_id}")
             encoder = Encoder(model)
             encode_input = encode_input_dict[divide_id]
             data_loader = convert_loader(encode_input, 128)

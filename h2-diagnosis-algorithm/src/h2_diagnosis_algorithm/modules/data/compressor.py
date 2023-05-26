@@ -208,6 +208,7 @@ class DataDivider:
         self.divide_num = divide_num
         self.normalize = normalize
         self.save_dir_name = save_dir_name
+        self.statistic = dict()
 
     def _divide_dataset_dict(self, data_dict: OrderedDict):
         """
@@ -273,7 +274,7 @@ class DataDivider:
                 self.statistic[divide_id] = statistic_dt
         else:
             # pd.DataFrame(index=variable_cols).to_csv(self.save_dir_name)
-            self.statistic = pd.DataFrame(index=variable_cols)
+            self.statistic[0] = pd.DataFrame(index=variable_cols)
         train_input = self._stack_data(divided_train_data)
         return train_input
 
@@ -291,7 +292,7 @@ class DataDivider:
             variable_cols = self.statistic[0].index
         else:
             # variable_cols = pd.read_csv(f"{self.save_dir_name}.csv", index_col=0).index
-            variable_cols = self.statistic.index
+            variable_cols = self.statistic[0].index
 
         variable_train_data = _remove_constant_cols(test_data_dict.values(), variable_cols)
         variable_train_data = OrderedDict({k:variable_train_data[k_id] for k_id, k in enumerate(test_data_dict.keys())})

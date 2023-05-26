@@ -46,6 +46,26 @@ class CnnTrainEncode:
         self.data_divider = DataDivider(divide_len, divide_num, normalize, f"{save_dir}{asset_type}")
         self.divide_encoder = DivideEncoder(divide_num, f"{save_dir}{asset_type}")
     
+    #add
+    # def get_train_input(self, train_data: dict):
+    #     """
+    #     get train data
+    #     train_data: train data dictionary
+    #     """
+    #     interval_train_data = split_interval_list(train_data, self.divide_len)
+    #     all_train_list = []
+    #     for asset in interval_train_data.keys():
+    #         if self.asset_type not in asset:
+    #             continue
+    #         asset_train_dt = remove_asset_part(interval_train_data[asset])
+    #         all_train_list.extend(asset_train_dt)
+
+    #     train_input = self.data_divider.train_compose(all_train_list)
+
+    #     return train_input
+    
+
+    # edited
     def train_models(self, train_data: dict, epochs: int, batch: int):
         """
         train_data: train data dictionary
@@ -62,9 +82,9 @@ class CnnTrainEncode:
         
         print(f"{self.asset_type} train start")
         train_input = self.data_divider.train_compose(all_train_list)
-        self.divide_encoder.train_dataset(train_input, epochs, batch)
+        return self.divide_encoder.train_dataset(train_input, epochs, batch)
 
-    def encode_models(self, encode_data: dict):
+    def encode_models(self, encode_data: dict, model):
         """
         Encode the data of dictionary.
 
@@ -84,7 +104,7 @@ class CnnTrainEncode:
                 for interval_id, interval_dt in enumerate(removed_encode_dt):
                     encode_input[f"{asset},{data_name},{key_list[interval_id]}"] = interval_dt
         encode_key, encode_input = self.data_divider.test_compose(encode_input)
-        encode_result = self.divide_encoder.encode_dataset(encode_input)
+        encode_result = self.divide_encoder.encode_dataset(encode_input, model)
         encode_result = _merge_divided_data(encode_key, encode_result)
         return encode_result
 

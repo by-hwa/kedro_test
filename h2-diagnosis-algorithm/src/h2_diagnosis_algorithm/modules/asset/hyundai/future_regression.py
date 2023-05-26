@@ -75,11 +75,11 @@ class CnnTrainTest:
         self.input_len = input_len
         self.output_len = output_len
         self.data_slider = DataSlider(input_len, output_len, normalize)
-        # if divide:
-        #     model_save_dir = f"{save_dir}{model_name}_divide/{asset_type}"
-        # else:
-        #     model_save_dir = f"{save_dir}{model_name}/{asset_type}"
-        # self.train_predictor = RegressorTranPredictor(model_name, model_save_dir)
+        if divide:
+            model_save_dir = f"{save_dir}{model_name}_divide/{asset_type}"
+        else:
+            model_save_dir = f"{save_dir}{model_name}/{asset_type}"
+        self.train_predictor = RegressorTranPredictor(model_name, model_save_dir)
     
     def train_asset(self, train_data: dict, epochs: int, batch: int):
         """
@@ -157,7 +157,7 @@ class CnnTrainTest:
         save_dir = f"{self.save_dir}{self.model_name}_divide/{self.asset_type}"
         asset_train_dt = remove_asset_part(all_asset_data)
         train_input, train_output = self.data_slider.train_compose(asset_train_dt, f"{save_dir}.csv")
-        self.train_predictor.train_dataset(train_input, train_output, epochs, batch)
+        return self.train_predictor.train_dataset(train_input, train_output, epochs, batch)
     
     def divdie_test_models(self, test_data: dict):
         """
