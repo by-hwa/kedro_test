@@ -8,7 +8,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=train_encode_model,
                 inputs=["train_set", "params:data_science_option"],
-                outputs=["HP_trained_model", "MP_trained_model", "HP_encode_model", "MP_encode_model"],
+                outputs=["HP_encode_model", "MP_encode_model"],
                 name="train_encode_model"
             ),
             node(

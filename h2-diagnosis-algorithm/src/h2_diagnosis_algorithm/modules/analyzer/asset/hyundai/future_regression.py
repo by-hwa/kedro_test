@@ -4,9 +4,9 @@ from itertools import groupby
 from operator import itemgetter
 import pandas as pd
 import matplotlib.pyplot as plt
-from data.compressor import DataSlider, ErrorAnalyzer
-from analyzer.regression import RegressorTranPredictor
-from asset.hyundai.data import split_interval_list, split_interval_dict, list_to_dict, read_variable_cols, reform_window_data, remove_asset_part
+from modules.data.compressor import DataSlider, ErrorAnalyzer
+from modules.analyzer.regression import RegressorTranPredictor
+from modules.asset.hyundai.data import split_interval_list, split_interval_dict, list_to_dict, read_variable_cols, reform_window_data, remove_asset_part
 
 def _asset_type_allocate(data_dict: dict, asset_type: str):
     """

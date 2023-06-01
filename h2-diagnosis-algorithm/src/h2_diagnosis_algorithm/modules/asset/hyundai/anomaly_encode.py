@@ -5,9 +5,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.cluster import DBSCAN
-from data.compressor import DataDivider
-from analyzer.autoencode import DivideEncoder
-from asset.hyundai.data import split_interval_list, split_interval_dict, remove_asset_part
+from modules.data.compressor import DataDivider
+from modules.analyzer.autoencode import DivideEncoder
+from modules.asset.hyundai.data import split_interval_list, split_interval_dict, remove_asset_part
 
 def _merge_divided_data(data_keys: list, divide_dict: OrderedDict):
     """

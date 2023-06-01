@@ -3,7 +3,7 @@ from datetime import timedelta
 import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view
 import matplotlib.pyplot as plt
-from data.compressor import find_asset_cols, find_interval_set
+from modules.data.compressor import find_asset_cols, find_interval_set
 
 def _subplot_legends(axs: np.ndarray):
     """

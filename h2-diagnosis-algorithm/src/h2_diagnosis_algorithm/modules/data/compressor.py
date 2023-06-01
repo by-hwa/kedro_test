@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view
 from datetime import timedelta
-from data.process import find_intervals, find_asset_cols
+from modules.data.process import find_intervals, find_asset_cols
 
 # def _combine_dict_lists(dict_list: dict):
 #     dict_vals = dict_list.values()
@@ -319,6 +319,7 @@ class DataSlider:
         self.input_len = input_len
         self.output_len = output_len
         self.normalize = normalize
+        self.statistic = dict()
 
     def _slide_data_list(self, data_list: list, stride: int, stack: bool):
         """
@@ -358,9 +359,11 @@ class DataSlider:
             statistic_dt = pd.concat([mean, std], axis=1)
             statistic_dt.columns = ["mean", "std"]
             # statistic_dt.to_csv(save_dir)
+            self.statistic = statistic_dt
         else:
             original_train_data = variable_train_data
             # pd.DataFrame(index=variable_cols).to_csv(save_dir)
+            self.statistic[0] = pd.DataFrame(index=variable_cols)
         train_input, train_output, _ = self._slide_data_list(original_train_data, 1, True)
         return train_input, train_output
     
@@ -373,7 +376,8 @@ class DataSlider:
         """
         if type(test_data_list) is not list:
             raise Exception("The input dataset must be a list of pd.DataFrame.")
-        statistics = pd.read_csv(save_dir, index_col=0)
+        # statistics = pd.read_csv(save_dir, index_col=0)
+        statistics = self.statistic
         variable_test_data = _remove_constant_cols(test_data_list, list(statistics.index))
         if self.normalize:
             original_test_data = _normalize_data(variable_test_data, statistics["mean"], statistics["std"])

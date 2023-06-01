@@ -14,12 +14,12 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=find_running_part,
                 inputs="params:preprocessing_option",
-                outputs="all_running_dt",
+                outputs="running_dt",
                 name="find_running_part",
             ),
             node(
                 func=split_train_test_data,
-                inputs=["all_running_dt", "data_split"],
+                inputs=["running_dt", "data_split"],
                 outputs=["train_set", "test_set"],
             ),
         ]

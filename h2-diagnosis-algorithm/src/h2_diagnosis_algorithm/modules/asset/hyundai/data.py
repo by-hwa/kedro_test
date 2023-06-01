@@ -3,7 +3,7 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 from collections import OrderedDict
-from data.process import find_intervals, find_asset_cols
+from modules.data.process import find_intervals, find_asset_cols
 
 def _find_interval_set(dataset: pd.DataFrame, min_len: int):
     """

@@ -6,3 +6,20 @@
 raw_datas:
   type: pandas.ParquetDataSet
   filepath: data/01_raw/
+
+# HP_trained_model:
+#   type: torch.
+#   filepath: data/06_models/HP_trained_model.pt
+# MP_trained_model:
+
+# HP_encode_model:
+
+# MP_encode_model:
+
+# HP_cluster:
+
+# MP_cluster:
+
+# HP_model:
+
+# MP_model:

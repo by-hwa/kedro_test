@@ -4,9 +4,9 @@ from itertools import groupby
 from operator import itemgetter
 import pandas as pd
 import matplotlib.pyplot as plt
-from data.compressor import DataSlider, ErrorAnalyzer
-from analyzer.regression import RegressorTranPredictor
-from asset.hyundai.data import split_interval_list, split_interval_dict, list_to_dict, read_variable_cols, reform_window_data, remove_asset_part
+from modules.data.compressor import DataSlider, ErrorAnalyzer
+from modules.analyzer.regression import RegressorTranPredictor
+from modules.asset.hyundai.data import split_interval_list, split_interval_dict, list_to_dict, read_variable_cols, reform_window_data, remove_asset_part
 
 def _asset_type_allocate(data_dict: dict, asset_type: str):
     """
@@ -188,7 +188,7 @@ class CnnTrainTest:
         return all_pred, all_output, all_times
 
 class ErrorJudge:
-    def __init__(self, train_true: dict, train_pred: dict, asset_type: str, variable_dir: str, threshold: float, standard_num: int):
+    def __init__(self, train_true: dict, train_pred: dict, asset_type: str, variable_dir: str, threshold: float, standard_num: int, model):
         """
         Judge and detect anomaly with the regression error.
 
@@ -198,6 +198,7 @@ class ErrorJudge:
         variable_dir: directory to variable columns
         threshold: judge threshold
         standard_num: standard number to judge anomaly 
+        model: torch model
         """
         self.variable_cols = read_variable_cols(variable_dir)
         self.asset_type = asset_type
@@ -205,6 +206,7 @@ class ErrorJudge:
         self.standard_num = standard_num
         self.error_analyzer = ErrorAnalyzer(3)
         self.error_standards = self._compute_error_standard(train_true, train_pred)
+        self.modle
 
     def _compute_error_standard(self, train_true: dict, train_pred: dict):
         """

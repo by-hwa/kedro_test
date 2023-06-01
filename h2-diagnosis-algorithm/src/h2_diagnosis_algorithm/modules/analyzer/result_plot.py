@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import calendar, os
 import numpy as np
 import matplotlib.pyplot as plt
-from asset.hyundai.data import split_interval_list, split_interval_dict
+from modules.asset.hyundai.data import split_interval_list, split_interval_dict
 
 class DatePlot:
     def __init__(self, raw_data, outlie_rate, judges, dates: list, cut_len: int, save_dir: str):

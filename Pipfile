@@ -11,7 +11,6 @@ isort = "~=5.0"
 jupyter = "~=1.0"
 jupyterlab = "~=3.0"
 kedro = "~=0.18.8"
-kedro-viz = "~=6.0"
 kedro-telemetry = "~=0.2.0"
 nbstripout = "~=0.4"
 pytest-cov = "~=3.0"
@@ -21,6 +20,7 @@ jupyterlab-server = "<2.16.0,>=2.11.1"
 kedro-datasets = {version = "~=1.0.0", extras = ["pandas.csvdataset", "pandas.exceldataset", "pandas.parquetdataset"]}
 scikit-learn = "~=1.0"
 matplotlib = "*"
+kedro-viz = "*"
 
 [dev-packages]
 kedro = "*"

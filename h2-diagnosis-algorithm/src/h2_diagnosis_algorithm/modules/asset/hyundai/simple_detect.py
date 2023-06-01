@@ -1,8 +1,8 @@
 import os
 from collections import OrderedDict
 import matplotlib.pyplot as plt
-from analyzer.simple_algorithm import SimpleAlgorithm
-from asset.hyundai.data import split_interval_list, split_interval_dict, list_to_dict
+from modules.analyzer.simple_algorithm import SimpleAlgorithm
+from modules.asset.hyundai.data import split_interval_list, split_interval_dict, list_to_dict
 
 class SimpleTrainTest:
     def __init__(self, save_dir: str, std_len:int, min_len: int):
