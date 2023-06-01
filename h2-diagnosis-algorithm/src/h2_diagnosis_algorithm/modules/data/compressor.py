@@ -1,65 +1,66 @@
 from collections import OrderedDict
 import pandas as pd
 import numpy as np
+import re
 from numpy.lib.stride_tricks import sliding_window_view
 from datetime import timedelta
 from modules.data.process import find_intervals, find_asset_cols
 
-# def _combine_dict_lists(dict_list: dict):
-#     dict_vals = dict_list.values()
-#     combined_list = []
-#     for l in dict_vals:
-#         combined_list.extend(l)
-#     return combined_list
+def _combine_dict_lists(dict_list: dict):
+    dict_vals = dict_list.values()
+    combined_list = []
+    for l in dict_vals:
+        combined_list.extend(l)
+    return combined_list
 
-# def _large_interval_find(whole_data, large_threshold, small_threshold):
-#     period = timedelta(seconds=10)
-#     large_index = whole_data.index[whole_data>large_threshold]
-#     rest_large_index = list(large_index)
-#     all_intervals = []
-#     while len(rest_large_index) > 0:
-#         start_index = rest_large_index[0]
-#         present_interval = [start_index, None]
-#         while True:
-#             max_period = whole_data.loc[start_index:start_index+period].max()
-#             if max_period > small_threshold:
-#                 start_index += period
-#             else:
-#                 present_interval[-1] = start_index
-#                 break
-#         rest_large_index = [i for i in rest_large_index if i > present_interval[-1]]
-#         all_intervals.append(present_interval)
-#     return all_intervals
+def _large_interval_find(whole_data, large_threshold, small_threshold):
+    period = timedelta(seconds=10)
+    large_index = whole_data.index[whole_data>large_threshold]
+    rest_large_index = list(large_index)
+    all_intervals = []
+    while len(rest_large_index) > 0:
+        start_index = rest_large_index[0]
+        present_interval = [start_index, None]
+        while True:
+            max_period = whole_data.loc[start_index:start_index+period].max()
+            if max_period > small_threshold:
+                start_index += period
+            else:
+                present_interval[-1] = start_index
+                break
+        rest_large_index = [i for i in rest_large_index if i > present_interval[-1]]
+        all_intervals.append(present_interval)
+    return all_intervals
 
-# def _find_start_point(col_data, threshold):
-#     large_threshold = threshold[1]
-#     small_threshold = threshold[0]
-#     if (col_data > large_threshold).sum() < 1:
-#          large_threshold = np.percentile(col_data, 95)
-#          small_threshold = np.percentile(col_data, 90) #(large_threshold + np.mean(col_data)) / 2
-#     large_intervals = _large_interval_find(col_data, large_threshold, small_threshold)
-#     small_start_index = col_data.index[col_data.index <= large_intervals[0][-1]][-1]
-#     return small_start_index
+def _find_start_point(col_data, threshold):
+    large_threshold = threshold[1]
+    small_threshold = threshold[0]
+    if (col_data > large_threshold).sum() < 1:
+         large_threshold = np.percentile(col_data, 95)
+         small_threshold = np.percentile(col_data, 90) #(large_threshold + np.mean(col_data)) / 2
+    large_intervals = _large_interval_find(col_data, large_threshold, small_threshold)
+    small_start_index = col_data.index[col_data.index <= large_intervals[0][-1]][-1]
+    return small_start_index
 
-# def _extract_interval_data(data_dict, all_cols=[]):
-#     data_intervals = find_interval_set(data_dict)
-#     interval_values = {}
-#     for data_name in data_dict.keys():
-#         dataset = data_dict[data_name]
-#         interval_values[data_name] = {}
-#         for asset in dataset.keys():
-#             asset_dt = dataset[asset]
-#             dt_intervals = data_intervals[data_name][asset]
-#             if len(all_cols) > 0:
-#                 asset_cols = find_asset_cols(asset_dt.columns, all_cols)
-#             else:
-#                 asset_cols = asset_dt.columns
-#             interval_values[data_name][asset] = {}
-#             for interval_id, interval in enumerate(dt_intervals):
-#                 interval_cols = [c for c in asset_cols if c in asset_dt.columns]
-#                 interval_dt = asset_dt.loc[interval[0]:interval[1], interval_cols]
-#                 interval_values[data_name][asset][interval_id] = interval_dt
-#     return interval_values
+def _extract_interval_data(data_dict, all_cols=[]):
+    data_intervals = find_interval_set(data_dict)
+    interval_values = {}
+    for data_name in data_dict.keys():
+        dataset = data_dict[data_name]
+        interval_values[data_name] = {}
+        for asset in dataset.keys():
+            asset_dt = dataset[asset]
+            dt_intervals = data_intervals[data_name][asset]
+            if len(all_cols) > 0:
+                asset_cols = find_asset_cols(asset_dt.columns, all_cols)
+            else:
+                asset_cols = asset_dt.columns
+            interval_values[data_name][asset] = {}
+            for interval_id, interval in enumerate(dt_intervals):
+                interval_cols = [c for c in asset_cols if c in asset_dt.columns]
+                interval_dt = asset_dt.loc[interval[0]:interval[1], interval_cols]
+                interval_values[data_name][asset][interval_id] = interval_dt
+    return interval_values
 
 def find_interval_set(data_dict):
     all_intervals = {}
@@ -110,89 +111,89 @@ def _slide_data(data, input_len, output_len, stride):
     output_times = output_times[range(0, len(output_times), stride)]
     return slide_input, slide_output, output_times
 
-# class TargetExtractor:
-#     def __init__(self, train_data, test_data, type_cols: dict, diff_period: int):
-#         """
-#         Extract the diagnosis target part of each data, based on the difference in a period.
-#         The value radically increases in the initial time and the increase-stopping point is captured as the target starting point.
-#         This also splits the train-test dataset and extracts columns based on the type columns.
+class TargetExtractor:
+    def __init__(self, train_data, test_data, type_cols: dict, diff_period: int):
+        """
+        Extract the diagnosis target part of each data, based on the difference in a period.
+        The value radically increases in the initial time and the increase-stopping point is captured as the target starting point.
+        This also splits the train-test dataset and extracts columns based on the type columns.
 
-#         data_dict: dictionary of running interval data
-#         train_test_name: train, test dataset name
-#         type_cols: type of columns to extract
-#         diff_period: period (time difference) to compute difference
-#         """
-#         self.train_data = train_data
-#         self.test_data = test_data
-#         self.diff_period = diff_period
-#         self.all_cols = _combine_dict_lists(type_cols)
+        data_dict: dictionary of running interval data
+        train_test_name: train, test dataset name
+        type_cols: type of columns to extract
+        diff_period: period (time difference) to compute difference
+        """
+        self.train_data = train_data
+        self.test_data = test_data
+        self.diff_period = diff_period
+        self.all_cols = _combine_dict_lists(type_cols)
 
-#         self.train_intervals = _extract_interval_data(self.train_data, self.all_cols)
-#         self.test_intervals = _extract_interval_data(self.test_data, self.all_cols)
-#         self.target_threshold = self._extract_thresholds()
-#         self.all_train_targets = self._extract_all_targets(self.train_intervals)
-#         self.all_test_targets = self._extract_all_targets(self.test_intervals)
+        self.train_intervals = _extract_interval_data(self.train_data, self.all_cols)
+        self.test_intervals = _extract_interval_data(self.test_data, self.all_cols)
+        self.target_threshold = self._extract_thresholds()
+        self.all_train_targets = self._extract_all_targets(self.train_intervals)
+        self.all_test_targets = self._extract_all_targets(self.test_intervals)
 
-#     def extract_train_diff_values(self):
-#         """
-#         Extract and stack the difference values of train dataset for each column.
-#         """
-#         train_values = {}
-#         for data_name in self.train_intervals.keys():
-#             dataset = self.train_intervals[data_name]
-#             for asset in dataset.keys():
-#                 dt_intervals = dataset[asset]
-#                 for interval_id in dt_intervals.keys():
-#                     interval_dt = dt_intervals[interval_id]
-#                     for col in interval_dt.columns:
-#                         if col not in train_values.keys():
-#                             train_values[col] = []
-#                         train_values[col].append(interval_dt[col].diff(self.diff_period).iloc[self.diff_period:])
-#         for col in train_values.keys():
-#             train_values[col] = np.concatenate(train_values[col])
-#         return train_values
+    def extract_train_diff_values(self):
+        """
+        Extract and stack the difference values of train dataset for each column.
+        """
+        train_values = {}
+        for data_name in self.train_intervals.keys():
+            dataset = self.train_intervals[data_name]
+            for asset in dataset.keys():
+                dt_intervals = dataset[asset]
+                for interval_id in dt_intervals.keys():
+                    interval_dt = dt_intervals[interval_id]
+                    for col in interval_dt.columns:
+                        if col not in train_values.keys():
+                            train_values[col] = []
+                        train_values[col].append(interval_dt[col].diff(self.diff_period).iloc[self.diff_period:])
+        for col in train_values.keys():
+            train_values[col] = np.concatenate(train_values[col])
+        return train_values
     
-#     def _extract_thresholds(self):
-#         """
-#         Extract difference thresholds of each column, from train dataset.
-#         """
-#         train_values = self.extract_train_diff_values()
-#         thresholds = {}
-#         for val_name in train_values.keys():
-#             values = train_values[val_name]
-#             max_val = np.max(values)
-#             mean_val = np.mean(values)
-#             high_threshold = (max_val+mean_val)/2
-#             low_threshold = np.percentile(values[values<high_threshold], 99)
-#             thresholds[val_name] = (low_threshold, high_threshold)
-#         return thresholds
+    def _extract_thresholds(self):
+        """
+        Extract difference thresholds of each column, from train dataset.
+        """
+        train_values = self.extract_train_diff_values()
+        thresholds = {}
+        for val_name in train_values.keys():
+            values = train_values[val_name]
+            max_val = np.max(values)
+            mean_val = np.mean(values)
+            high_threshold = (max_val+mean_val)/2
+            low_threshold = np.percentile(values[values<high_threshold], 99)
+            thresholds[val_name] = (low_threshold, high_threshold)
+        return thresholds
 
-#     def _extract_interval_target(self, interval_data: pd.DataFrame):
-#         diff_data = interval_data.diff(periods=self.diff_period).iloc[self.diff_period:]
-#         all_col_target = {}
-#         for col in self.target_threshold.keys():
-#             if col not in diff_data.columns:
-#                 continue
-#             col_dt = diff_data[col]
-#             col_threshold = self.target_threshold[col]
-#             target_start = _find_start_point(col_dt, col_threshold)
-#             col_target = interval_data.loc[target_start:, col]
-#             all_col_target[col] = col_target
-#         return all_col_target
+    def _extract_interval_target(self, interval_data: pd.DataFrame):
+        diff_data = interval_data.diff(periods=self.diff_period).iloc[self.diff_period:]
+        all_col_target = {}
+        for col in self.target_threshold.keys():
+            if col not in diff_data.columns:
+                continue
+            col_dt = diff_data[col]
+            col_threshold = self.target_threshold[col]
+            target_start = _find_start_point(col_dt, col_threshold)
+            col_target = interval_data.loc[target_start:, col]
+            all_col_target[col] = col_target
+        return all_col_target
     
-#     def _extract_all_targets(self, interval_data_dict):
-#         all_targets = {}
-#         for data_name in interval_data_dict.keys():
-#             dataset = interval_data_dict[data_name]
-#             all_targets[data_name] = {}
-#             for asset in dataset.keys():
-#                 dt_intervals = dataset[asset]
-#                 all_targets[data_name][asset] = {}
-#                 for interval_id in dt_intervals.keys():
-#                     interval_dt = dt_intervals[interval_id]
-#                     target_dt = self._extract_interval_target(interval_dt)
-#                     all_targets[data_name][asset][interval_id] = target_dt
-#         return all_targets
+    def _extract_all_targets(self, interval_data_dict):
+        all_targets = {}
+        for data_name in interval_data_dict.keys():
+            dataset = interval_data_dict[data_name]
+            all_targets[data_name] = {}
+            for asset in dataset.keys():
+                dt_intervals = dataset[asset]
+                all_targets[data_name][asset] = {}
+                for interval_id in dt_intervals.keys():
+                    interval_dt = dt_intervals[interval_id]
+                    target_dt = self._extract_interval_target(interval_dt)
+                    all_targets[data_name][asset][interval_id] = target_dt
+        return all_targets
 
 class DataDivider:
     def __init__(self, divide_len: int, divide_num: int, normalize: bool, save_dir_name: str):
@@ -276,7 +277,7 @@ class DataDivider:
             # pd.DataFrame(index=variable_cols).to_csv(self.save_dir_name)
             self.statistic[0] = pd.DataFrame(index=variable_cols)
         train_input = self._stack_data(divided_train_data)
-        return train_input
+        return train_input, self.statistic
 
     def test_compose(self, test_data_dict: OrderedDict):
         """
@@ -349,6 +350,7 @@ class DataSlider:
         train_data_list: list of train data
         save_dir: directory to save mean, std and variable columns
         """
+        asset = re.search(r"/([^/]+)\.csv$", save_dir)[1]
         if type(train_data_list) is not list:
             raise Exception("The input dataset must be a list of pd.DataFrame.")
         variable_cols = _find_variable_cols(train_data_list)
@@ -359,13 +361,13 @@ class DataSlider:
             statistic_dt = pd.concat([mean, std], axis=1)
             statistic_dt.columns = ["mean", "std"]
             # statistic_dt.to_csv(save_dir)
-            self.statistic = statistic_dt
+            self.statistic[asset] = statistic_dt
         else:
             original_train_data = variable_train_data
             # pd.DataFrame(index=variable_cols).to_csv(save_dir)
-            self.statistic[0] = pd.DataFrame(index=variable_cols)
+            self.statistic[asset] = pd.DataFrame(index=variable_cols)
         train_input, train_output, _ = self._slide_data_list(original_train_data, 1, True)
-        return train_input, train_output
+        return train_input, train_output, self.statistic
     
     def test_compose(self, test_data_list: list, save_dir: str):
         """
@@ -374,13 +376,15 @@ class DataSlider:
         test_data_list: list of test data
         save_dir: directory of mean, std and variable columns saved
         """
+        asset = re.search(r"/([^/]+)\.csv$", save_dir)[1]
+
         if type(test_data_list) is not list:
             raise Exception("The input dataset must be a list of pd.DataFrame.")
         # statistics = pd.read_csv(save_dir, index_col=0)
         statistics = self.statistic
-        variable_test_data = _remove_constant_cols(test_data_list, list(statistics.index))
+        variable_test_data = _remove_constant_cols(test_data_list, list(statistics[asset].index))
         if self.normalize:
-            original_test_data = _normalize_data(variable_test_data, statistics["mean"], statistics["std"])
+            original_test_data = _normalize_data(variable_test_data, statistics[asset]["mean"], statistics[asset]["std"])
         else:
             original_test_data = variable_test_data
         test_input, test_output, test_times = self._slide_data_list(original_test_data, self.output_len, False)

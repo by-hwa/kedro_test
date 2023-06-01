@@ -81,8 +81,8 @@ class CnnTrainEncode:
             all_train_list.extend(asset_train_dt)
         
         print(f"{self.asset_type} train start")
-        train_input = self.data_divider.train_compose(all_train_list)
-        return self.divide_encoder.train_dataset(train_input, epochs, batch)
+        train_input, statistic = self.data_divider.train_compose(all_train_list)
+        return self.divide_encoder.train_dataset(train_input, epochs, batch), statistic
 
     def encode_models(self, encode_data: dict, model):
         """

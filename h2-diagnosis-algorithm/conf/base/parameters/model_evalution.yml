@@ -1,4 +1,4 @@
-data_science_option:
+evaluation_option:
   cluster-training: False
   training: True
   split-time:

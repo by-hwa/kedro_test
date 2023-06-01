@@ -177,7 +177,7 @@ class RegressorTranPredictor:
         data_loader = convert_loader(train_input, train_output, batch)
         trainer.fit(data_loader, epochs)
         # torch.save(trainer.model, self.save_dir)
-        # self.model = trainer.model
+        self.model = trainer.model
         return trainer.model
 
     def predict_dataset(self, test_input: list):
@@ -186,7 +186,9 @@ class RegressorTranPredictor:
 
         test_input: test input data
         """
-        model = torch.load(self.save_dir)
+        # model = torch.load(self.save_dir)
+        model = self.model
+    
         tester = NnTester(model)
         all_preds = []
         for data in test_input:

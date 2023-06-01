@@ -156,8 +156,8 @@ class CnnTrainTest:
         print(f"{self.asset_type} train start")
         save_dir = f"{self.save_dir}{self.model_name}_divide/{self.asset_type}"
         asset_train_dt = remove_asset_part(all_asset_data)
-        train_input, train_output = self.data_slider.train_compose(asset_train_dt, f"{save_dir}.csv")
-        return self.train_predictor.train_dataset(train_input, train_output, epochs, batch)
+        train_input, train_output, statistic = self.data_slider.train_compose(asset_train_dt, f"{save_dir}.csv")
+        return self.train_predictor.train_dataset(train_input, train_output, epochs, batch), statistic
     
     def divdie_test_models(self, test_data: dict):
         """
@@ -188,7 +188,7 @@ class CnnTrainTest:
         return all_pred, all_output, all_times
 
 class ErrorJudge:
-    def __init__(self, train_true: dict, train_pred: dict, asset_type: str, variable_dir: str, threshold: float, standard_num: int, model):
+    def __init__(self, train_true: dict, train_pred: dict, asset_type: str, variable_dir: str, threshold: float, standard_num: int, statistic):
         """
         Judge and detect anomaly with the regression error.
 
@@ -198,15 +198,22 @@ class ErrorJudge:
         variable_dir: directory to variable columns
         threshold: judge threshold
         standard_num: standard number to judge anomaly 
-        model: torch model
+        statistic: statistic data
         """
-        self.variable_cols = read_variable_cols(variable_dir)
+        # edit
+        # self.variable_cols = read_variable_cols(variable_dir)
+        self.variable_cols = self.read_variable_col(statistic)
         self.asset_type = asset_type
         self.threshold = threshold
         self.standard_num = standard_num
         self.error_analyzer = ErrorAnalyzer(3)
         self.error_standards = self._compute_error_standard(train_true, train_pred)
-        self.modle
+
+    def read_variable_col(self, statistic):
+        variable_cols = OrderedDict()
+        for k in statistic.keys():
+            variable_cols[k] = list(statistic[k])
+        return variable_cols
 
     def _compute_error_standard(self, train_true: dict, train_pred: dict):
         """
@@ -320,7 +327,7 @@ class ErrorJudge:
                         axs[1].axhline(self.error_standards["low"][col], color='r', linestyle='--')
                         axs[1].axhline(self.error_standards["high"][col], color='r', linestyle='--')
                         fig.suptitle(f"{dt_name} - {asset} - interval{interval_id} - {col}")
-                        plt.savefig(f"{plot_save_dir}{col}_interval{interval_id}")
+                        # plt.savefig(f"{plot_save_dir}{col}_interval{interval_id}")
                         plt.close()
 
     def plot_results(self, outlie_rate: dict, judge: dict, save_dir: str):
@@ -347,5 +354,5 @@ class ErrorJudge:
                     plt.ylim(-0.1, 1.1)
                     if interval_judge:
                         plt.axvspan(interval_rate.index[0], interval_rate.index[-1], color='r', alpha=0.3)
-                    plt.savefig(f"{plot_save_dir}out_rate_interval{interval_id}")
+                    # plt.savefig(f"{plot_save_dir}out_rate_interval{interval_id}")
                     plt.close()
