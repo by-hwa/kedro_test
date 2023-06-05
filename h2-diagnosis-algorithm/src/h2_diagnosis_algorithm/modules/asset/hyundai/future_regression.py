@@ -202,17 +202,17 @@ class ErrorJudge:
         """
         # edit
         # self.variable_cols = read_variable_cols(variable_dir)
-        self.variable_cols = self.read_variable_col(statistic)
         self.asset_type = asset_type
+        self.variable_cols = self.read_variable_col(statistic, self.asset_type)
         self.threshold = threshold
         self.standard_num = standard_num
         self.error_analyzer = ErrorAnalyzer(3)
         self.error_standards = self._compute_error_standard(train_true, train_pred)
 
-    def read_variable_col(self, statistic):
+    def read_variable_col(self, statistic, asset_type):
         variable_cols = OrderedDict()
-        for k in statistic.keys():
-            variable_cols[k] = list(statistic[k])
+        df = pd.DataFrame(statistic[asset_type])
+        variable_cols[asset_type] = df.index.tolist()
         return variable_cols
 
     def _compute_error_standard(self, train_true: dict, train_pred: dict):

@@ -145,7 +145,7 @@ def reform_window_data(window_data: np.ndarray, column_names: list, index=None):
     if index is None:
         index = range(len(reform_window_data))
     reform_window_data = pd.DataFrame(reform_window_data, 
-                                    #   columns=column_names,
+                                      columns=column_names,
                                         index=index)
     return reform_window_data
 

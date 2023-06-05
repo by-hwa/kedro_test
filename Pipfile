@@ -21,6 +21,7 @@ kedro-datasets = {version = "~=1.0.0", extras = ["pandas.csvdataset", "pandas.ex
 scikit-learn = "~=1.0"
 matplotlib = "*"
 kedro-viz = "*"
+pyyaml = "*"
 
 [dev-packages]
 kedro = "*"

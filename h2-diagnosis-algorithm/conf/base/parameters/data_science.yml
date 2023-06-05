@@ -20,3 +20,6 @@ data_science_option:
     - "lube"
   asset-hp: "HP"
   asset-mp: "MP"
+  encode-train-option:
+    epoch: 70
+    batch: 4

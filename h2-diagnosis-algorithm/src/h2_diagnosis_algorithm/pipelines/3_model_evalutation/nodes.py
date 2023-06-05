@@ -29,3 +29,8 @@ def error_judge(statistic:pd.DataFrame, pred_value: dict, asset: str, parameters
     test_outlie_rate, test_judge = error_judge.compute_test_results(test_error, time_test)
 
     return error_judge.plot_data_error(true_test, pred_test, test_error, time_test, plot_save_dir), error_judge.plot_results(test_outlie_rate, test_judge, plot_save_dir)
+
+
+
+def test():
+    return 'hi'

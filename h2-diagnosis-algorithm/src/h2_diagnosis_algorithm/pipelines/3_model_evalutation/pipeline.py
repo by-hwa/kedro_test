@@ -1,6 +1,6 @@
 from kedro.pipeline import Pipeline, node, pipeline
 
-from .nodes import error_judge
+from .nodes import error_judge, test
 
 def create_pipeline(**kwargs) -> Pipeline:
     return pipeline(
@@ -17,5 +17,11 @@ def create_pipeline(**kwargs) -> Pipeline:
             outputs=["mp_plot_data_error", "mp_plot_result"],
             name="mp_error_judge"
             )
+            # node(
+            #     func=test,
+            #     inputs=None,
+            #     outputs='test',
+            #     name='test'
+            # )
         ]
     )
