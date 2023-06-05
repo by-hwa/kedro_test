@@ -27,8 +27,5 @@ def error_judge(statistic:pd.DataFrame, pred_value: dict, asset: str, parameters
     error_judge = ErrorJudge(true_train, pred_train, asset, f"models/v3_daily/{model_name}_divide/", 0.5, 60, statistic)
     test_error = error_judge.compute_test_error(true_test, pred_test)
     test_outlie_rate, test_judge = error_judge.compute_test_results(test_error, time_test)
-    error_judge.plot_data_error(true_test, pred_test, test_error, time_test, plot_save_dir)
-    error_judge.plot_results(test_outlie_rate, test_judge, plot_save_dir)
 
-def test():
-    return "test"
+    return error_judge.plot_data_error(true_test, pred_test, test_error, time_test, plot_save_dir), error_judge.plot_results(test_outlie_rate, test_judge, plot_save_dir)

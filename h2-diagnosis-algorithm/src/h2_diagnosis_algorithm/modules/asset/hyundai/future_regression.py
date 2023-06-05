@@ -328,7 +328,9 @@ class ErrorJudge:
                         axs[1].axhline(self.error_standards["high"][col], color='r', linestyle='--')
                         fig.suptitle(f"{dt_name} - {asset} - interval{interval_id} - {col}")
                         # plt.savefig(f"{plot_save_dir}{col}_interval{interval_id}")
+
                         plt.close()
+        return fig
 
     def plot_results(self, outlie_rate: dict, judge: dict, save_dir: str):
         """
@@ -356,3 +358,4 @@ class ErrorJudge:
                         plt.axvspan(interval_rate.index[0], interval_rate.index[-1], color='r', alpha=0.3)
                     # plt.savefig(f"{plot_save_dir}out_rate_interval{interval_id}")
                     plt.close()
+        return plt

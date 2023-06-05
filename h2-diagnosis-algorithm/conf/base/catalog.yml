@@ -23,3 +23,23 @@ raw_datas:
 # HP_model:
 
 # MP_model:
+
+hp_plot_data_error:
+  type: matplotlib.MatplotlibWriter
+  filepath: data/09_tracking/hp_plot_data_error.jpeg
+  versioned: true
+
+hp_plot_result:
+  type: matplotlib.MatplotlibWriter
+  filepath: data/09_tracking/hp_plot_result.jpeg
+  versioned: true
+
+mp_plot_data_error:
+  type: matplotlib.MatplotlibWriter
+  filepath: data/09_tracking/mp_plot_data_error.jpeg
+  versioned: true
+
+mp_plot_result:
+  type: matplotlib.MatplotlibWriter
+  filepath: data/09_tracking/mp_plot_result.jpeg
+  versioned: true

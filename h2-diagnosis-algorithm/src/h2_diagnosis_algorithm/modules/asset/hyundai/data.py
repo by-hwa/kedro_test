@@ -144,7 +144,9 @@ def reform_window_data(window_data: np.ndarray, column_names: list, index=None):
     reform_window_data = window_data.transpose((0, 2, 1)).reshape((window_data.shape[0]*window_data.shape[2], window_data.shape[1]))
     if index is None:
         index = range(len(reform_window_data))
-    reform_window_data = pd.DataFrame(reform_window_data, columns=column_names, index=index)
+    reform_window_data = pd.DataFrame(reform_window_data, 
+                                    #   columns=column_names,
+                                        index=index)
     return reform_window_data
 
 def split_train_test_data(data_dict: dict, split_name: dict):
